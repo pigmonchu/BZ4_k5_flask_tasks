@@ -1,5 +1,6 @@
 from tasks import app
 from flask import render_template, request, redirect, url_for
+from tasks.forms import TaskForm
 
 import csv
 
@@ -16,25 +17,27 @@ def index():
         registros.append(linea)
 
     fdatos.close()
-    print()
-    print(registros)
-    print()
     return render_template("index.html", registros=registros) 
 
 
 @app.route("/newtask", methods=['GET', 'POST'])
 def newTask():
+    form = TaskForm(request.form)
+
     if request.method == 'GET':
-        return render_template("task.html")
+        return render_template("task.html", form=form)
 
-    fdatos = open(DATOS, 'a')
-    csvwriter = csv.writer(fdatos, delimiter=",", quotechar='"')
+    if form.validate():
+        fdatos = open(DATOS, 'a')
+        csvwriter = csv.writer(fdatos, delimiter=",", quotechar='"')
 
-    title = request.values.get('title')
-    desc = request.values.get('desc')
-    date = request.values.get('date')
+        title = request.values.get('title')
+        desc = request.values.get('description')
+        date = request.values.get('date')
 
-    csvwriter.writerow([title, desc, date])
+        csvwriter.writerow([title, desc, date])
 
-    fdatos.close()
-    return redirect(url_for("index"))
+        fdatos.close()
+        return redirect(url_for("index"))
+    else:
+        return render_template("task.html", form=form)
