@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title%} Lista tareas {% endblock %}
+
+{% block content %}
+    <h1>Mis tareas</h1>
+    <table class="tasks">
+        <tr>
+            <th>Titulo</th>
+            <th>Descripción</th>
+            <th>Fecha</th>
+        </tr>
+        {% for tarea in tareas %}
+        <tr>
+            <td>{{tarea.title}}</a></td>
+            <td>{{tarea.description}}</td>
+            <td>{{tarea.date}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

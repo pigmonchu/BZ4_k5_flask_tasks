@@ -1,0 +1,20 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    <header>
+        Gestor de tareas
+    </header>
+    <nav><a href="/">Inicio</a> | <a href="/newtask">Nueva</a></nav>
+    <section>
+        {% block content %}{% endblock %}
+    </section>
+    <footer>
+        &copy; 2019 - Todos los derechos reservados
+    </footer>
+</body>
+</html>
