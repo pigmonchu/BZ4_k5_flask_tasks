@@ -2,11 +2,13 @@ from tasks import app
 from flask import render_template, request, redirect, url_for
 from tasks.forms import TaskForm, ProccesTaskForm
 
-import csv
+import csv, sqlite3
 from datetime import date
 
 DATOS = './data/tareas.txt'
 COPIA = './data/copia.txt'
+BASE_DATOS = './data/tasks.db'
+
 cabecera = ['title', 'description', 'date']
 
 @app.route("/")
@@ -86,21 +88,22 @@ def proccesTask():
         return render_template("processtask.html", form=form)
 
 
-    if form.validate():
-        print("Modificar el fichero")
-        '''
-        Crear fichero copia vacio en escritura
-        leer y copiar todos los registros desde tareas.txt a copia.txt hasta el anterior al que vamos a modificar
-        grabar el nuevo registro con los datos del formulario
-        leer y copiar el resto de los registros hasta el final
-        cerrar los dos ficheros
-        borrar tareas.txt
-        renombrar copia.txt a tareas.txt
-        '''
-
-        original = fopen(DATOS, 'r')
-        copia = fopen(COPIA, 'w')
-
+    if form.btn.data == 'B':
+        print('borrar Registro')
         return redirect(url_for('index'))
 
-    return render_template("processtask.html", form=form)
+    if form.btn.data == 'M':
+        if form.validate():
+            print("Modificar el fichero")
+            '''
+            Crear fichero copia vacio en escritura
+            leer y copiar todos los registros desde tareas.txt a copia.txt hasta el anterior al que vamos a modificar
+            grabar el nuevo registro con los datos del formulario
+            leer y copiar el resto de los registros hasta el final
+            cerrar los dos ficheros
+            borrar tareas.txt
+            renombrar copia.txt a tareas.txt
+            '''
+            return redirect(url_for('index'))
+
+        return render_template("processtask.html", form=form)
