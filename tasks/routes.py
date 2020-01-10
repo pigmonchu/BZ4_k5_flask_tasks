@@ -2,7 +2,7 @@ from tasks import app
 from flask import render_template, request, redirect, url_for
 from tasks.forms import TaskForm, ProccesTaskForm
 
-import csv, sqlite3
+import csv, sqlite3, os
 from datetime import date
 
 DATOS = './data/tareas.txt'
@@ -10,6 +10,18 @@ COPIA = './data/copia.txt'
 BASE_DATOS = './data/tasks.db'
 
 cabecera = ['title', 'description', 'date']
+
+def openFiles(DATOS, COPIA):
+    original = open(DATOS, 'r')
+    copia = open(COPIA, 'w')
+    return original, copia
+def closeFiles(original, copia):
+    original.close()
+    copia.close()
+def renameFiles(DATOS, COPIA):
+    os.remove(DATOS)
+    os.rename(COPIA, DATOS)
+
 
 @app.route("/")
 def index():
@@ -38,7 +50,7 @@ def newTask():
 
         title = request.values.get('title')
         desc = request.values.get('description')
-        date = request.values.get('date')
+        date = request.values.get('fx')
 
         csvwriter.writerow([title, desc, date])
 
@@ -61,49 +73,76 @@ def proccesTask():
 
         registroAct = None
         ilinea = 1
-        ix = int(request.values.get('ix'))
-        for linea in csvreader:
-            if ilinea == ix:
-                registroAct = linea
-                break
-            ilinea += 1
+        
+        ix = request.values.get('ix')
+        if ix:
+            ix = int(ix)
+            for linea in csvreader:
+                if ilinea == ix:
+                    registroAct = linea
+                    break
+                ilinea += 1
 
-        if registroAct:
-            if registroAct[2]:
-                fechaTarea = date(int(registroAct[2][:4]), int(registroAct[2][5:7]), int(registroAct[2][8:]))
-            else:
-                fechaTarea = None
+            if registroAct:
+                if registroAct[2]:
+                    fechaTarea = date(int(registroAct[2][:4]), int(registroAct[2][5:7]), int(registroAct[2][8:]))
+                else:
+                    fechaTarea = None
 
-            accion = ''
+                accion = ''
 
-            if 'btnModificar' in request.values:
-                accion = 'M'
-            
-            if 'btnBorrar' in request.values:
-                accion = 'B'
+                if 'btnModificar' in request.values:
+                    accion = 'M'
+                
+                if 'btnBorrar' in request.values:
+                    accion = 'B'
 
 
-            form = ProccesTaskForm(data={'ix': ix, 'title': registroAct[0], 'description': registroAct[1], 'date': fechaTarea, 'btn': accion})
+                form = ProccesTaskForm(data={'ix': ix, 'title': registroAct[0], 'description': registroAct[1], 'fx': fechaTarea, 'btn': accion})
 
-        return render_template("processtask.html", form=form)
-
+            return render_template("processtask.html", form=form)
+        else:
+            return redirect(url_for("index"))
 
     if form.btn.data == 'B':
-        print('borrar Registro')
+        original, copia = openFiles(DATOS, COPIA)
+        csvreader = csv.reader(original, delimiter=",", quotechar='"')
+        ix = int(request.values.get('ix'))
+        for ilinea, linea in enumerate(csvreader, start=1):
+            csvwriter = csv.writer(copia, delimiter=",", quotechar='"', lineterminator='\r')
+        
+            if ilinea == ix:
+                pass
+            else:
+                title = linea[0]
+                desc = linea[1]
+                fx = linea[2]
+                csvwriter.writerow([title, desc, fx])
+        closeFiles(original, copia)
+        renameFiles(DATOS, COPIA)
         return redirect(url_for('index'))
-
+    
     if form.btn.data == 'M':
         if form.validate():
-            print("Modificar el fichero")
-            '''
-            Crear fichero copia vacio en escritura
-            leer y copiar todos los registros desde tareas.txt a copia.txt hasta el anterior al que vamos a modificar
-            grabar el nuevo registro con los datos del formulario
-            leer y copiar el resto de los registros hasta el final
-            cerrar los dos ficheros
-            borrar tareas.txt
-            renombrar copia.txt a tareas.txt
-            '''
-            return redirect(url_for('index'))
-
+            
+            original, copia = openFiles(DATOS, COPIA)
+            csvreader = csv.reader(original, delimiter=",", quotechar='"')
+            ix = int(request.values.get('ix'))
+            for ilinea, linea in enumerate(csvreader, start=1):
+                csvwriter = csv.writer(copia, delimiter=",", quotechar='"', lineterminator='\r')
+           
+                if ilinea == ix:
+                    title = request.values.get('title')
+                    desc = request.values.get('description')
+                    fx = request.values.get('fx')
+                    csvwriter.writerow([title, desc, fx])
+                else:
+                    title = linea[0]
+                    desc = linea[1]
+                    fx = linea[2]
+                    csvwriter.writerow([title, desc, fx])
+            closeFiles(original, copia)
+            renameFiles(DATOS, COPIA)
+            return redirect(url_for("index"))
         return render_template("processtask.html", form=form)
+
