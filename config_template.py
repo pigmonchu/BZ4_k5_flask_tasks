@@ -1,2 +1,2 @@
 SECRET_KEY=b'<aquí tu clave>'
-DB_FILE=b'nombre de fichero sqlite3'
+DB_FILE='nombre de fichero sqlite3'

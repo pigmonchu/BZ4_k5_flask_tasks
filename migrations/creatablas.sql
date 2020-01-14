@@ -5,4 +5,4 @@ CREATE TABLE "tareas" (
 	"titulo"	TEXT NOT NULL,
 	"descripcion"	TEXT,
 	"fecha"	TEXT NOT NULL
-);
+)
