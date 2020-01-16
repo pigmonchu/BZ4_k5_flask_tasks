@@ -5,4 +5,13 @@ CREATE TABLE "tareas" (
 	"titulo"	TEXT NOT NULL,
 	"descripcion"	TEXT,
 	"fecha"	TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS empleados;
+
+CREATE TABLE "empleados" (
+	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+	"name"	TEXT NOT NULL,
+	"apellidos"	TEXT NOT NULL,
+	"email"	TEXT NOT NULL
 )

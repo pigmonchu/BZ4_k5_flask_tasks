@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateField, SubmitField, HiddenField
-from wtforms.validators import DataRequired, Length, ValidationError, AnyOf
+from wtforms.validators import DataRequired, Length, ValidationError, AnyOf, Email
 from wtforms.widgets import TextArea
 
 from datetime import date
@@ -27,3 +27,18 @@ class ProccesTaskForm(FlaskForm):
 
     submit = SubmitField('Aceptar')
 
+class EmployeeForm(FlaskForm):
+    name = StringField('Nombre', validators=[DataRequired()])
+    lastname = StringField('Apellidos', validators=[DataRequired()])
+    email = StringField('Correo electrónico', validators=[DataRequired(), Email()])
+
+    submit = SubmitField('Enviar')
+
+class ProccessEmployeeForm(FlaskForm):
+    id = HiddenField('id', validators=[DataRequired()])
+    btn = HiddenField('btn', validators=[DataRequired(), AnyOf(['M', 'B'])])
+    name = StringField('Nombre', validators=[DataRequired()])
+    lastname = StringField('Apellidos', validator=[DataRequired()])
+    email = StringField('Correo electrónico', validator=[DataRequired(), Email()])
+
+    submit = SubmitField('Aceptar')
