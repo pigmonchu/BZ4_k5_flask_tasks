@@ -43,24 +43,19 @@ def index():
 
     return render_template("index.html", registros=registros) 
 
-@app.route("/employees")
-def employees():
-    registros = dbQuery('SELECT name, apellidos, email, id FROM empleados;')
-
-    if registros:
-        if isinstance(registros, dict):
-            registros = [registros]
-    else:
-        registros = []
-
-    return render_template("employees.html", registros=registros)
-
 
 
 @app.route("/newtask", methods=['GET', 'POST'])
 def newTask():
-    form = TaskForm(request.form)
+    consulta = """
+        SELECT id, name, apellidos FROM empleados;
+    """
+    empleados = dbQuery(consulta)
 
+    mychoices = [(-1, 'Seleccione Empleado')]+[(e['id'], '{} {}'.format(e['name'], e['apellidos'])) for e in empleados]
+
+    form = TaskForm(request.form)
+    form.updateChoices(mychoices)
     if request.method == 'GET':
         return render_template("task.html", form=form)
 
@@ -68,40 +63,19 @@ def newTask():
         title = request.values.get('title')
         desc = request.values.get('description')
         fx = request.values.get('fx')
+        id_employee = request.values.get('id_employee')
+        if id_employee == '-1':
+            id_employee == None
 
         consulta = """
-        INSERT INTO tareas (titulo, descripcion, fecha)
-                    VALUES (?, ?, ?);
+        INSERT INTO tareas (titulo, descripcion, fecha, id_empleado)
+                    VALUES (?, ?, ?, ?);
         """
-        dbQuery(consulta, title, desc, fx)
+        dbQuery(consulta, title, desc, fx, id_employee)
 
         return redirect(url_for("index"))
     else:
         return render_template("task.html", form=form)
-
-@app.route("/newemployee", methods=['GET', 'POST'])
-def newEmployee():
-    form = EmployeeForm(request.form)
-
-    if request.method == 'GET':
-        return render_template("employee.html", form=form)
-
-    if form.validate():
-        name = request.values.get('name')
-        lastname = request.values.get('lastname')
-        email = request.values.get('email')
-
-        consulta = """
-        INSERT INTO empleados (name, apellidos, email)
-                    VALUES (?, ?, ?);
-        """
-        dbQuery(consulta, name, lastname, email)
-
-        return redirect(url_for("employees"))
-    else:
-        return render_template("employee.html", form=form)
-
-
 
 @app.route("/processtask", methods=['GET', 'POST'])
 def proccesTask():
@@ -163,6 +137,40 @@ def proccesTask():
 
             return redirect(url_for("index"))
         return render_template("processtask.html", form=form)
+
+@app.route("/employees")
+def employees():
+    registros = dbQuery('SELECT name, apellidos, email, id FROM empleados;')
+
+    if registros:
+        if isinstance(registros, dict):
+            registros = [registros]
+    else:
+        registros = []
+
+    return render_template("employees.html", registros=registros)
+
+@app.route("/newemployee", methods=['GET', 'POST'])
+def newEmployee():
+    form = EmployeeForm(request.form)
+
+    if request.method == 'GET':
+        return render_template("employee.html", form=form)
+
+    if form.validate():
+        name = request.values.get('name')
+        lastname = request.values.get('lastname')
+        email = request.values.get('email')
+
+        consulta = """
+        INSERT INTO empleados (name, apellidos, email)
+                    VALUES (?, ?, ?);
+        """
+        dbQuery(consulta, name, lastname, email)
+
+        return redirect(url_for("employees"))
+    else:
+        return render_template("employee.html", form=form)
 
 @app.route("/processemployee", methods=["GET", "POST"])
 def proccesEmployee():

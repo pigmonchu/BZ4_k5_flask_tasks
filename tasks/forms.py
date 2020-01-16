@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, SubmitField, HiddenField
+from wtforms import StringField, DateField, SubmitField, HiddenField, SelectField
 from wtforms.validators import DataRequired, Length, ValidationError, AnyOf, Email
-from wtforms.widgets import TextArea
+from wtforms.widgets import TextArea, Select
 
 from datetime import date
 
@@ -15,8 +15,12 @@ class TaskForm(FlaskForm):
     title = StringField('Título', validators=[DataRequired(), Length(min=3, max=15, message="La longitud ha de estar entre 3 y 15")])
     description = StringField('Descripción', widget=TextArea())
     fx = DateField('Fecha', validators=[DataRequired(), greater_than_today])
+    id_employee = SelectField('Empleado', coerce=int)
 
     submit = SubmitField('Enviar')
+
+    def updateChoices(self, mychoices):
+        self.id_employee.choices = mychoices
 
 class ProccesTaskForm(FlaskForm):
     ix = HiddenField('ix', validators=[DataRequired()])

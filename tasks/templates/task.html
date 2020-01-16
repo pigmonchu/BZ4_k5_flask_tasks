@@ -7,7 +7,7 @@
     <form action="/newtask" method="post">
         {{ form.hidden_tag() }}
         <div class="row">
-            <div class="six columns">
+            <div class="four columns">
                 {{ form.title(class="u-full-width", placeholder="Título") }}
                 {% if form.title.errors %}
                     {% for error in form.title.errors %}
@@ -15,10 +15,18 @@
                     {% endfor %}
                 {% endif %}
             </div>
-            <div class="six columns">
+            <div class="four columns">
                 {{ form.fx(class='u-full-width', type="date") }}
                 {% if form.fx.errors %}
                     {% for error in form.fx.errors %}
+                        <p class='field-error'>{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="four columns">
+                {{ form.id_employee(class='u-full-width') }}
+                {% if form.id_employee.errors %}
+                    {% for error in form.id_employee.errors %}
                         <p class='field-error'>{{ error }}</p>
                     {% endfor %}
                 {% endif %}
