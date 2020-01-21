@@ -5,7 +5,7 @@
 {% block content %}
     <h1>Nueva tarea</h1>
     <form action="/newtask" method="post">
-        {{ form.hidden_tag() }}
+        {{ form.hidden_tag() }} 
         <div class="row">
             <div class="six columns">
                 {{ form.title(class="u-full-width", placeholder="Título") }}
